@@ -553,7 +553,7 @@ CircleCollider2D:
   m_UsedByComposite: 0
   m_Offset: {x: 0, y: 0}
   serializedVersion: 2
-  m_Radius: 0.5
+  m_Radius: 0.75
 --- !u!114 &2204690680095585619
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -572,6 +572,8 @@ MonoBehaviour:
     type: 3}
   implosion: {fileID: 4642043408304131862, guid: 46215c86493825548878fb3754e7d6d2,
     type: 3}
+  deathDamage: 0
+  gracePeriod: 0.25
   maxHealth: 25
 --- !u!114 &6343436208773650393
 MonoBehaviour:
@@ -587,6 +589,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   contactDamage: 0
   lr: {fileID: 0}
+  isStun: 0
 --- !u!1 &8654632534551835433
 GameObject:
   m_ObjectHideFlags: 0

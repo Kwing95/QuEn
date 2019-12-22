@@ -30,6 +30,7 @@ public class PlayerMover : MonoBehaviour
     private new CircleCollider2D collider;
     private DamageDealer damager;
 
+    private bool clickedWorld = false;
     private float stamina = 0;
     private float timeDown = 0f;
     private bool mouseDown = false;
@@ -112,50 +113,64 @@ public class PlayerMover : MonoBehaviour
         // Checking events for mouse PRESS/RELEASE
         // https://stackoverflow.com/questions/38198745/how-to-detect-left-mouse-click-but-not-when-the-click-occur-on-a-ui-button-compo
         if (Input.GetKeyDown(KeyCode.Mouse0) && !EventSystem.current.IsPointerOverGameObject())
-        {
-            mouseDown = true;
+            OnPress();
+        if (Input.GetKeyUp(KeyCode.Mouse0) && clickedWorld)
+            OnRelease();
 
+    }
+
+    public void OnPress()
+    {
+        if (Keypad.instance.activeSelf)
+        {
+            Keypad.instance.GetComponent<Keypad>().ToggleEnabled();
+            return;
+        }
+
+        clickedWorld = true;
+        mouseDown = true;
+
+        if (distance > 1)
+            state = State.Dashing;
+        else
+        {
+            charge.GetComponent<RingRenderer>().SetEnabled(false, true);
+            chargeMax.SetEnabled(true, false);
+            charge.Count(maxTapLength);
+            state = State.Blocking;
+        }
+    }
+
+    public void OnRelease()
+    {
+        clickedWorld = false;
+
+        jumpLine.enabled = false;
+        chargeMax.SetEnabled(false, false);
+        if (state != State.Jumping)
+            charge.GetComponent<RingRenderer>().SetEnabled(false, false);
+        mouseDown = false;
+
+        switch (state)
+        {
+            case State.None:
+                charge.Hide();
+                break;
+            case State.Dashing:
+                state = State.None;
+                break;
+            case State.Jumping:
+                charge.Hide();
+                state = State.None;
+                return;
+        }
+
+
+        if (timeDown < maxTapLength)
             if (distance > 1)
-                state = State.Dashing;
+                Dash(mousePosition);
             else
-            {
-                charge.GetComponent<RingRenderer>().SetEnabled(false, true);
-                chargeMax.SetEnabled(true, false);
-                charge.Count(maxTapLength);
-                state = State.Blocking;
-            }            
-        }
-
-        if (Input.GetKeyUp(KeyCode.Mouse0) && !EventSystem.current.IsPointerOverGameObject())
-        {
-            jumpLine.enabled = false;
-            chargeMax.SetEnabled(false, false);
-            if(state != State.Jumping)
-                charge.GetComponent<RingRenderer>().SetEnabled(false, false);
-            mouseDown = false;
-
-            switch (state)
-            {
-                case State.None:
-                    charge.Hide();
-                    break;
-                case State.Dashing:
-                    state = State.None;
-                    break;
-                case State.Jumping:
-                    charge.Hide();
-                    state = State.None;
-                    return;
-            }
-
-
-            if (timeDown < maxTapLength)
-                if (distance > 1)
-                    Dash(mousePosition);
-                else
-                    Block();
-        }
-
+                Block();
     }
     
     private void Dash(Vector3 mousePosition)
@@ -252,6 +267,9 @@ public class PlayerMover : MonoBehaviour
 
     private bool StaminaCheck(float minimum)
     {
+        if (CodeManager.instance.GetBuffStaminaTimer() > 0)
+            return true;
+
         if(stamina >= minimum)
         {
             stamina -= minimum;

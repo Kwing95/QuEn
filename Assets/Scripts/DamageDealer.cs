@@ -70,6 +70,8 @@ public class DamageDealer : MonoBehaviour
 
     private bool DamagesOther(Status otherStatus)
     {
+        if (status == Status.Vulnerable)
+            return false;
         // Enemies take priority over enemies
         if (status == otherStatus)
             return !isFriendly;

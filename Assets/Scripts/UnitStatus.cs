@@ -13,19 +13,17 @@ public class UnitStatus : MonoBehaviour
     public float deathDamage = 0;
     public float gracePeriod = 0.25f;
 
-    private Rigidbody2D rb;
-    private new CircleCollider2D collider;
+    protected Rigidbody2D rb;
+    protected new CircleCollider2D collider;
 
-    private bool isFriendly;
     public float maxHealth = 100;
-    private float health;
-    private float graceTimer = 0;
+    protected float health;
+    protected float graceTimer = 0;
 
     // Start is called before the first frame update
-    void Start()
+    public void Start()
     {
         collider = GetComponent<CircleCollider2D>();
-        isFriendly = GetComponent<PlayerMover>();
         rb = GetComponent<Rigidbody2D>();
 
         health = maxHealth;
@@ -33,7 +31,7 @@ public class UnitStatus : MonoBehaviour
     }
 
     // Update is called once per frame
-    void Update()
+    public void Update()
     {
         graceTimer -= Time.deltaTime;
     }
@@ -43,10 +41,26 @@ public class UnitStatus : MonoBehaviour
         return health;
     }
 
-    public void TakeDamage(float damage)
+    protected virtual void Death()
+    {
+        GameObject newImplosion = Instantiate(implosion, transform.position, Quaternion.identity);
+
+        if (deathDamage > 0)
+            newImplosion.GetComponent<Imploder>().Initialize(Color.red, deathDamage, DamageDealer.Status.Heavy);
+        else
+            newImplosion.GetComponent<Imploder>().Initialize(Color.green, 0, DamageDealer.Status.Vulnerable);
+
+        Destroy(gameObject);
+        // if player, stop enemies from referencing null
+        //Instantiate(explosion)
+    }
+
+    public virtual void TakeDamage(float damage)
     {
         if (graceTimer > 0)
             return;
+
+        damage = PowerupCheck(damage);
 
         graceTimer = gracePeriod;
 
@@ -57,18 +71,7 @@ public class UnitStatus : MonoBehaviour
         damageText.GetComponent<DamageNumber>().Initialize(damage);
 
         if (health <= 0)
-        {
-            GameObject newImplosion = Instantiate(implosion, transform.position, Quaternion.identity);
-
-            if(deathDamage > 0)
-                newImplosion.GetComponent<Imploder>().Initialize(Color.red, deathDamage, DamageDealer.Status.Heavy);
-            else
-                newImplosion.GetComponent<Imploder>().Initialize(Color.green, 0, DamageDealer.Status.Vulnerable);
-
-            Destroy(gameObject);
-            // if player, stop enemies from referencing null
-            //Instantiate(explosion)
-        }
+            Death();
     }
 
     public void TakeDamage(float damage, Vector3 otherPosition)
@@ -80,6 +83,15 @@ public class UnitStatus : MonoBehaviour
             Vector3 direction = Vector3.Normalize(otherPosition - transform.position);
             rb.AddForce(-1000 * direction); // This should be adjustable
         }
+    }
+
+    // attack or defense
+    public float PowerupCheck(float amount)
+    {
+        if(GetComponent<PlayerMover>())
+            return amount * (CodeManager.instance.GetBuffDefenseTimer() > 0 ? 0.5f : 1);
+        else
+            return amount * (CodeManager.instance.GetBuffAttackTimer() > 0 ? 2 : 1);
     }
 
 }
