@@ -42,11 +42,21 @@ public class DamageDealer : MonoBehaviour
 
     private void Collide(Collision2D collision)
     {
-        DamageDealer otherDamager = collision.gameObject.GetComponent<DamageDealer>();
+        DamageDealer otherDamager = collision.gameObject.GetComponentInChildren<DamageDealer>();
         UnitStatus otherUnit = collision.gameObject.GetComponent<UnitStatus>();
 
+        bool isUnit = otherDamager && otherUnit;
+        bool isWall = otherUnit && !otherDamager;
+        bool isAttack = otherDamager && !otherUnit;
+
+        if (isWall)
+        {
+            unitsHit.Add(otherUnit.gameObject);
+            otherUnit.TakeDamage(contactDamage);
+        }
+
         // otherUnit is (intentionally) null for projectiles or disjointed hitboxes
-        if (otherDamager && otherUnit && DamagesOther(otherDamager.status) &&
+        if (isUnit && DamagesOther(otherDamager.status) &&
             !unitsHit.Contains(otherUnit.gameObject))
         {
             unitsHit.Add(otherUnit.gameObject);
@@ -58,12 +68,21 @@ public class DamageDealer : MonoBehaviour
             // Used to be a switch(case) for specials here
 
             otherUnit.TakeDamage(contactDamage, transform.position);
-            
-            if (isProjectile)
-                Destroy(this);
         }
 
-        if (isProjectile)
+        // If a projectile hits a stun attack
+        if (isProjectile && isAttack && otherDamager.isStun)
+        {
+            if (status == Status.Light)
+            {
+                GetComponent<Bullet>().Reflect(-1.5f);
+                isFriendly = !otherDamager.isFriendly;
+                gameObject.layer = LayerMask.NameToLayer("PlayerProj");
+            }
+            return;
+        }
+
+        if(isProjectile)
             Destroy(gameObject);
             
     }

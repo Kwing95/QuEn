@@ -590,10 +590,10 @@ PlayerSettings:
   facebookXfbml: 0
   facebookFrictionlessRequests: 1
   apiCompatibilityLevel: 6
-  cloudProjectId: ca705a10-afd3-453e-9568-6236feba5a80
+  cloudProjectId: 19182b2b-e7f9-42b5-8908-51fc52826626
   framebufferDepthMemorylessMode: 0
   projectName: MobileBash
-  organizationId: thejunkiebox-gmail-com
+  organizationId: kevinecove
   cloudEnabled: 0
   enableNativePlatformBackendsForNewInputSystem: 0
   disableOldInputManagerSupport: 0

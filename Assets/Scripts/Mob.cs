@@ -5,6 +5,8 @@ using UnityEngine;
 public class Mob : MonoBehaviour
 {
 
+    private static int mobCount = 0;
+
     public GameObject bullet;
 
     public List<Action> attackPattern;
@@ -49,7 +51,7 @@ public class Mob : MonoBehaviour
     }
 
     private State state;
-    private Priority priority;
+    private Priority priority = Priority.Vulnerable;
 
     private bool canAct = true;
     private bool canMove = false;
@@ -58,47 +60,33 @@ public class Mob : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        mobCount += 1;
         rb = GetComponent<Rigidbody2D>();
         status = GetComponent<UnitStatus>();
         damager = GetComponent<DamageDealer>();
 
         if(attackPattern.Count == 0)
-            attackPattern.Add(new Action());
+            attackPattern.Add(new Action()); //attackPattern = Randomize();
         else
             state = attackPattern[0].state;
+    }
+
+    private void OnDestroy()
+    {
+        mobCount -= 1;
     }
 
     // Update is called once per frame
     void Update()
     {
         if(stunTimer > 0)
-        {
             stunTimer -= Time.deltaTime;
-            return;
-        }
-
-        if (canAct)
+        else if (canAct)
         {
             patternProgress = (patternProgress + 1) % attackPattern.Count;
             canAct = false;
-
             Action action = attackPattern[patternProgress];
-
-            switch (action.state)
-            {
-                case State.Pause:
-                    StartCoroutine(Pause(action.duration));
-                    break;
-                case State.Dash:
-                    StartCoroutine(Dash(action.power, action.speed, action.priority, action.angle, action.error));
-                    break;
-                case State.Shoot:
-                    StartCoroutine(Shoot(action.power, action.priority, action.error));
-                    break;
-                case State.Move:
-                    MoveTimer(action.duration);
-                    break;
-            }
+            Act(action);
         }
         else if (canMove)
         {
@@ -107,14 +95,40 @@ public class Mob : MonoBehaviour
         }
     }
 
-    public IEnumerator Shoot(float power, DamageDealer.Status priority, float error)
+    private void Act(Action action)
+    {
+        switch (action.state)
+        {
+            case State.Pause:
+                StartCoroutine(Pause(action.duration));
+                break;
+            case State.Dash:
+                StartCoroutine(Dash(action.power, action.speed, action.priority, action.angle, action.error));
+                break;
+            case State.Shoot:
+                StartCoroutine(Shoot(action.power, action.speed, action.priority, action.error));
+                break;
+            case State.Move:
+                StartCoroutine(MoveTimer(action.duration));
+                break;
+        }
+    }
+
+    public void Initialize(List<Action> _pattern, float _deathDamage, float _stunLength)
+    {
+        attackPattern = _pattern;
+        GetComponent<UnitStatus>().deathDamage = _deathDamage;
+        stunLength = _stunLength;
+    }
+
+    public IEnumerator Shoot(float power, float speed, DamageDealer.Status priority, float error)
     {
         Vector3 direction = Vector3.Normalize(PlayerMover.instance.transform.position - transform.position);
         direction = Quaternion.Euler(0, 0, Random.Range(-error, error)) * direction;
 
         GameObject newBullet = Instantiate(bullet, transform.position, Quaternion.identity);
-        newBullet.layer = LayerMask.NameToLayer("EnemyProj");
-        newBullet.GetComponent<Rigidbody2D>().velocity = 10 * direction; // adjust projectile speed
+        newBullet.layer = LayerMask.NameToLayer(priority == DamageDealer.Status.Light ? "LightEnemyProj" : "HeavyEnemyProj");
+        newBullet.GetComponent<Bullet>().InitializeVelocity(10 * direction);
         newBullet.GetComponent<DamageDealer>().SetStatus(priority, power, true);
 
         yield return new WaitForSeconds(0);
@@ -123,7 +137,7 @@ public class Mob : MonoBehaviour
 
     public void Move(float speed, float angle)
     {
-        Vector3 direction = speed * Vector3.Normalize(PlayerMover.instance.transform.position - transform.position);
+        Vector3 direction = Time.deltaTime * speed * Vector3.Normalize(PlayerMover.instance.transform.position - transform.position);
         direction = Quaternion.Euler(0, 0, angle) * direction;
         rb.AddForce(direction);
     }
@@ -144,7 +158,7 @@ public class Mob : MonoBehaviour
         float error = (minError + Random.Range(0, maxError)) * (Random.Range(0, 2) == 0 ? 1 : -1);
         direction = Quaternion.Euler(0, 0, error) * direction;
         rb.AddForce(direction);
-        StartCoroutine(damager.TempStatus(priority, 10, 0.3f));
+        StartCoroutine(damager.TempStatus(priority, power, 0.3f));
 
         yield return new WaitForSeconds(0);
         canAct = true;
@@ -164,6 +178,11 @@ public class Mob : MonoBehaviour
     public Priority GetPriority()
     {
         return priority;
+    }
+
+    public static int GetMobCount()
+    {
+        return mobCount;
     }
 
 }

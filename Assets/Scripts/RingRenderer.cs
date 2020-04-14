@@ -10,6 +10,7 @@ public class RingRenderer : MonoBehaviour
     public Color color;
     public float width = 0.1f;
     public int segments = 15;
+    public bool isBox = false;
 
     private float xRadius;
     private float yRadius;
@@ -33,6 +34,12 @@ public class RingRenderer : MonoBehaviour
         SetEnabled(true, false);
     }
 
+    public void SetSegments(int num)
+    {
+        segments = num;
+        Redraw();
+    }
+
     public void Redraw()
     {
         // Update line color and width
@@ -48,7 +55,11 @@ public class RingRenderer : MonoBehaviour
         yRadius = boundingBox.y / (2 * transform.localScale.y);
 
         // Redraw circle 
-        DrawCircle();
+        if (isBox)
+            DrawBox();
+        else
+            DrawCircle();
+
     }
 
     public void SetEnabled(bool ringEnabled, bool spriteEnabled)
@@ -84,5 +95,19 @@ public class RingRenderer : MonoBehaviour
 
             angle += (360f / segments);
         }
+    }
+
+    private void DrawBox(float size = 1)
+    {
+        size /= 2;
+        lr.startWidth = lr.endWidth = 0.2f;
+        lr.positionCount = 10;
+        lr.SetPositions(new Vector3[] {
+            new Vector3(-size, -size), new Vector3(-size, -size),
+            new Vector3(-size, size), new Vector3(-size, size),
+            new Vector3(size, size), new Vector3(size, size),
+            new Vector3(size, -size), new Vector3(size, -size),
+            new Vector3(-size, -size), new Vector3(-size, -size)});
+
     }
 }

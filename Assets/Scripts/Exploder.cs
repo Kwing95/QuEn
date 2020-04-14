@@ -9,7 +9,6 @@ public class Exploder : MonoBehaviour
     public new CircleCollider2D collider;
     private DamageDealer damager;
 
-    private float alpha = 1f;
     private float maxLifetime = 1;
     private float lifetime = 1;
     private float maximumSize = 0.4f;

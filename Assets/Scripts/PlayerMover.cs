@@ -98,13 +98,16 @@ public class PlayerMover : MonoBehaviour
             timeDown += Time.deltaTime;
             // When performing a charged action
             if(timeDown > maxTapLength) {
-                if (state == State.Dashing)
+                switch (state)
                 {
-                    if(stamina >= 20)
-                        ChargeJump(mousePosition);
+                    case State.Dashing:
+                        if (stamina >= 20 && MapManager.InRoom(mousePosition))
+                            ChargeJump(mousePosition);
+                        break;
+                    case State.Blocking:
+                        PlaceRod();
+                        break;
                 }
-                else if(state == State.Blocking)
-                    PlaceRod();
             }
         }
         else
@@ -121,9 +124,9 @@ public class PlayerMover : MonoBehaviour
 
     public void OnPress()
     {
-        if (Keypad.instance.activeSelf)
+        if (PauseMenu.instance.activeSelf)
         {
-            Keypad.instance.GetComponent<Keypad>().ToggleEnabled();
+            PauseMenu.instance.GetComponent<PauseMenu>().ToggleEnabled();
             return;
         }
 
@@ -226,14 +229,15 @@ public class PlayerMover : MonoBehaviour
     {
         yield return new WaitForSeconds(jumpTime);
 
-        RaycastHit2D[] hits = Physics2D.CircleCastAll(transform.position, 0.5f, Vector3.zero, 0, LayerMask.GetMask("Enemy"));
+        RaycastHit2D[] hits = Physics2D.CircleCastAll(transform.position, 0.5f, Vector3.zero, 0, LayerMask.GetMask("Enemy") | LayerMask.GetMask("Barrier"));
 
         foreach(RaycastHit2D hit in hits)
             if (hit.collider)
             {
-                Mob target = hit.collider.gameObject.GetComponent<Mob>();
+                UnitStatus target = hit.collider.gameObject.GetComponent<UnitStatus>();
+                Debug.Log(target);
                 if (target)
-                    target.GetComponent<UnitStatus>().TakeDamage(40, transform.position);
+                    target.TakeDamage(40, transform.position);
             }
 
         GameObject hitbox = Instantiate(explosion, transform.position, Quaternion.identity);

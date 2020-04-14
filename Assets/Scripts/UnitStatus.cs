@@ -4,7 +4,6 @@ using UnityEngine;
 
 public class UnitStatus : MonoBehaviour
 {
-
     public LineRenderer lr;
     public HealthBar healthBar;
     public GameObject damageDisplay;
@@ -43,7 +42,7 @@ public class UnitStatus : MonoBehaviour
 
     protected virtual void Death()
     {
-        GameObject newImplosion = Instantiate(implosion, transform.position, Quaternion.identity);
+        GameObject newImplosion = Instantiate(implosion, transform.position, Quaternion.identity, PrefabManager.instance.roomObjects.transform);
 
         if (deathDamage > 0)
             newImplosion.GetComponent<Imploder>().Initialize(Color.red, deathDamage, DamageDealer.Status.Heavy);
@@ -67,7 +66,7 @@ public class UnitStatus : MonoBehaviour
         health -= damage;
         healthBar.SetHealth(health / maxHealth);
 
-        GameObject damageText = Instantiate(damageDisplay, transform.position, Quaternion.identity);
+        GameObject damageText = Instantiate(damageDisplay, transform.position, Quaternion.identity, PrefabManager.instance.roomObjects.transform);
         damageText.GetComponent<DamageNumber>().Initialize(damage);
 
         if (health <= 0)

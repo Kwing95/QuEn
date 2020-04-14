@@ -62,6 +62,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   contactDamage: 0
   lr: {fileID: 0}
+  isStun: 0
 --- !u!1 &5732530821583254226
 GameObject:
   m_ObjectHideFlags: 0
@@ -151,6 +152,7 @@ GameObject:
   m_Component:
   - component: {fileID: 7389411441908681114}
   - component: {fileID: 7389411441908681116}
+  - component: {fileID: 6572975009724839102}
   m_Layer: 0
   m_Name: Explosion
   m_TagString: Untagged
@@ -188,3 +190,24 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   sr: {fileID: 7177757000889620853}
   collider: {fileID: 3869532890439951777}
+--- !u!50 &6572975009724839102
+Rigidbody2D:
+  serializedVersion: 4
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7389411441908681118}
+  m_BodyType: 1
+  m_Simulated: 1
+  m_UseFullKinematicContacts: 1
+  m_UseAutoMass: 0
+  m_Mass: 1
+  m_LinearDrag: 0
+  m_AngularDrag: 0.05
+  m_GravityScale: 1
+  m_Material: {fileID: 0}
+  m_Interpolate: 0
+  m_SleepingMode: 1
+  m_CollisionDetection: 1
+  m_Constraints: 0

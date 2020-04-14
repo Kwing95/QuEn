@@ -27,8 +27,11 @@ public class Imploder : MonoBehaviour
 
         if(transform.localScale.x <= 0.01f)
         {
-            GameObject newExplosion = Instantiate(explosion, transform.position, Quaternion.identity);
-            newExplosion.GetComponent<Exploder>().Initialize(sr.color, 0.33f, 0.9f, "Default", damage, priority);
+            if(damage > 0)
+            {
+                GameObject newExplosion = Instantiate(explosion, transform.position, Quaternion.identity, PrefabManager.instance.roomObjects.transform);
+                newExplosion.GetComponent<Exploder>().Initialize(sr.color, 0.33f, 0.9f, "Default", damage, priority);
+            }
 
             Destroy(gameObject);
         }

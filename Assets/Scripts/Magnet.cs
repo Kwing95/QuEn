@@ -20,7 +20,7 @@ public class Magnet : MonoBehaviour
                     caughtRigidbodies[i].GetComponent<UnitStatus>().TakeDamage(100);
                 else if (caughtRigidbodies[i].GetComponent<PlayerMover>())
                 {
-                    caughtRigidbodies[i].AddForce(7000 * (caughtRigidbodies[i].transform.position - transform.position));
+                    caughtRigidbodies[i].AddForce(9000 * (caughtRigidbodies[i].transform.position - transform.position));
                     caughtRigidbodies[i].GetComponent<UnitStatus>().TakeDamage(20);
                 }
             }
