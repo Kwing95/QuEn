@@ -7,6 +7,7 @@ TextureImporter:
     21300004: powerups_2
     21300006: powerups_3
     21300008: powerups_4
+    21300010: powerups_5
   externalObjects: {}
   serializedVersion: 9
   mipmaps:
@@ -130,13 +131,13 @@ TextureImporter:
         width: 100
         height: 100
       alignment: 0
-      pivot: {x: 0.5, y: 0.5}
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 5fe53c7a505797a40bf2cd28cd8ea984
+      spriteID: 1ffd70c803e51cc4cae6c48fee75cc24
       vertices: []
       indices: 
       edges: []
@@ -150,13 +151,13 @@ TextureImporter:
         width: 100
         height: 100
       alignment: 0
-      pivot: {x: 0.5, y: 0.5}
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: f14bdaef58931924b845c9e6ecadf5eb
+      spriteID: ab3ca808c1f95c842a5052b2c16fc823
       vertices: []
       indices: 
       edges: []
@@ -170,13 +171,13 @@ TextureImporter:
         width: 100
         height: 100
       alignment: 0
-      pivot: {x: 0.5, y: 0.5}
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 1934616080424a6439e9c78f3d4ff0d8
+      spriteID: 98ac3f0cbb652b945a9ccbfa304592e5
       vertices: []
       indices: 
       edges: []
@@ -190,13 +191,13 @@ TextureImporter:
         width: 100
         height: 100
       alignment: 0
-      pivot: {x: 0.5, y: 0.5}
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: c332bcd86ae93e74988664c27150c68e
+      spriteID: c6a6b5cee651cdf41bc6de921f063bd8
       vertices: []
       indices: 
       edges: []
@@ -210,13 +211,33 @@ TextureImporter:
         width: 100
         height: 100
       alignment: 0
-      pivot: {x: 0.5, y: 0.5}
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 824a1957cabd5254eb17f6319f9f7eca
+      spriteID: 039b26df26a6f0f4ebbe1e81aa6a0e31
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: powerups_5
+      rect:
+        serializedVersion: 2
+        x: 200
+        y: 0
+        width: 100
+        height: 100
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 19257b048bbc56940a876b95819d4e08
       vertices: []
       indices: 
       edges: []

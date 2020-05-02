@@ -33,6 +33,23 @@ public class UnitStatus : MonoBehaviour
     public void Update()
     {
         graceTimer -= Time.deltaTime;
+        EnforceBoundaries();
+    }
+
+    private void EnforceBoundaries()
+    {
+        if (!GetComponent<Rigidbody2D>())
+            return;
+
+        if (rb.position.x > Room.ROOM_BOUNDARY)
+            rb.position = new Vector2(Room.ROOM_BOUNDARY, rb.position.y);
+        else if (rb.position.x < -Room.ROOM_BOUNDARY)
+            rb.position = new Vector2(-Room.ROOM_BOUNDARY, rb.position.y);
+
+        if (rb.position.y > Room.ROOM_BOUNDARY)
+            rb.position = new Vector2(rb.position.x, Room.ROOM_BOUNDARY);
+        else if (rb.position.y < -Room.ROOM_BOUNDARY)
+            rb.position = new Vector2(rb.position.x, -Room.ROOM_BOUNDARY);
     }
 
     public float GetHealth()
@@ -40,7 +57,20 @@ public class UnitStatus : MonoBehaviour
         return health;
     }
 
-    protected virtual void Death()
+    private static void RoomCLearCheck()
+    {
+        if (PrefabManager.instance.enemies.transform.childCount == 0)
+        {
+            // OnRoomClear
+            // Passcode goes 
+            Passcode.GetPasscodeByLocation(new Point(Room.location.x, Room.location.y)).RevealCode();
+
+            RoomArranger.GetCurrent().Clear();
+            RoomArranger.instance.ConfigureDoors();
+        }
+    }
+
+    public virtual void Death()
     {
         GameObject newImplosion = Instantiate(implosion, transform.position, Quaternion.identity, PrefabManager.instance.roomObjects.transform);
 
@@ -49,7 +79,13 @@ public class UnitStatus : MonoBehaviour
         else
             newImplosion.GetComponent<Imploder>().Initialize(Color.green, 0, DamageDealer.Status.Vulnerable);
 
+        transform.SetParent(null);
+
+        if(GetComponent<Mob>() != null)
+            RoomCLearCheck();
+
         Destroy(gameObject);
+
         // if player, stop enemies from referencing null
         //Instantiate(explosion)
     }
@@ -88,9 +124,9 @@ public class UnitStatus : MonoBehaviour
     public float PowerupCheck(float amount)
     {
         if(GetComponent<PlayerMover>())
-            return amount * (CodeManager.instance.GetBuffDefenseTimer() > 0 ? 0.5f : 1);
+            return amount * (PasscodeManager.instance.DefenseBuffActive() ? 0.25f : 1);
         else
-            return amount * (CodeManager.instance.GetBuffAttackTimer() > 0 ? 2 : 1);
+            return amount * (PasscodeManager.instance.AttackBuffActive() ? 2 : 1);
     }
 
 }

@@ -22,8 +22,12 @@ public class MobMaker : MonoBehaviour
 
     private void Start()
     {
-        for(int i = 0; i < 3; ++i)
-            AddMobType();
+
+    }
+
+    public static void ClearMobTypes()
+    {
+        mobTypes = new List<MobType>();
     }
 
     public static void AddMobType()
@@ -36,10 +40,23 @@ public class MobMaker : MonoBehaviour
         mobTypes.Add(newMob);
     }
 
-    public static void CreateMob(Vector2 position, MobType mobType = null)
+    public static void CreateMob(Vector2 position, MobType mobType)
     {
         GameObject newMob = Instantiate(PrefabManager.instance.mob, position, Quaternion.identity, PrefabManager.instance.enemies.transform);
         newMob.GetComponent<Mob>().Initialize(mobType.attackPattern, mobType.deathDamage, mobType.stunLength);
+    }
+
+    public static void CreateMob(Vector2 position)
+    {
+        CreateMob(position, mobTypes[PRNG.Range(0, mobTypes.Count)]);
+    }
+
+    public static void KillAllEnemies()
+    {
+        List<UnitStatus> enemies = new List<UnitStatus>();
+
+        foreach (Transform child in PrefabManager.instance.enemies.transform)
+            child.GetComponent<UnitStatus>().TakeDamage(100);
     }
 
     public static MobType RandomMob()

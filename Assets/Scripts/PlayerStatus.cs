@@ -30,7 +30,7 @@ public class PlayerStatus : UnitStatus
             if (health >= maxHealth)
             {
                 health = maxHealth;
-                life += 1;
+                // life += 1; // when commented, gives infinite lives
                 isRespawning = false;
 
                 collider.enabled = true;
@@ -49,7 +49,7 @@ public class PlayerStatus : UnitStatus
         healthBar.SetHealth(health / maxHealth);
     }
 
-    protected override void Death()
+    public override void Death()
     {
         GameObject newImplosion = Instantiate(implosion, transform.position, Quaternion.identity);
 
@@ -63,7 +63,7 @@ public class PlayerStatus : UnitStatus
         player.enabled = false;
         rb.isKinematic = true;
 
-        if (life >= 3)
+        if (life >= maxLives)
             StartCoroutine(GameOver());
         else
             isRespawning = true;

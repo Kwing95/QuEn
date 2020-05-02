@@ -12,16 +12,21 @@ public class PlayerMover : MonoBehaviour
     public GameObject lightningRod;
     public GameObject explosion;
     public SpriteRenderer sr;
+    public SpriteWedge cooldownDisplay;
 
     public static PlayerMover instance;
 
-    public float maxStamina = 100;
-    public float staminaRegeneration = 8;
+    public bool cooldownActive = true;
     public float moveForce = 3000;
     public float maxTapLength = 0.25f;
     public float bulletSpeed = 20f;
-    public float jumpChargeSpeed = 10;
+    public float jumpChargeSpeed = 50;
     public float jumpTime = 0.33f;
+
+    public float dashCooldown = 0.2f;
+    public float stompCooldown = 0.5f;
+    public float blockCooldown = 0.5f;
+    public float placeCooldown = 0.5f;
 
     private GraphicRaycaster raycaster;
     private Rigidbody2D rb;
@@ -31,9 +36,10 @@ public class PlayerMover : MonoBehaviour
     private DamageDealer damager;
 
     private bool clickedWorld = false;
-    private float stamina = 0;
+    private float actionCooldown = 0;
     private float timeDown = 0f;
     private bool mouseDown = false;
+
     private enum State { None, Dashing, Jumping, Blocking };
     private State state = State.None;
 
@@ -42,7 +48,7 @@ public class PlayerMover : MonoBehaviour
     private float distance;
 
     // Start is called before the first frame update
-    void Start()
+    void Awake()
     {
         instance = this;
 
@@ -60,25 +66,14 @@ public class PlayerMover : MonoBehaviour
         tr.startColor = tr.endColor = Color.yellow;
 
         chargeMax.SetEnabled(false, false);
-        stamina = maxStamina;
+
+        Camera.main.orthographicSize = 17 - GameOptions.cameraZoom;
     }
 
     // Update is called once per frame
     void Update()
     {
-        if(stamina < maxStamina)
-            stamina += Time.deltaTime * staminaRegeneration;
-        else
-            stamina = maxStamina;
-
-        staminaBar.SetScale(stamina / maxStamina);
-
-        if (stamina < 10)
-            staminaBar.GetComponentInChildren<Image>().color = Color.red;
-        else if (stamina < 20)
-            staminaBar.GetComponentInChildren<Image>().color = new Color(1, 0.5f, 0);
-        else
-            staminaBar.GetComponentInChildren<Image>().color = Color.yellow;
+        actionCooldown -= Time.deltaTime;
 
         if(state != State.Dashing)
         {
@@ -101,11 +96,11 @@ public class PlayerMover : MonoBehaviour
                 switch (state)
                 {
                     case State.Dashing:
-                        if (stamina >= 20 && MapManager.InRoom(mousePosition))
+                        if (actionCooldown <= 0 && MapManager.InRoom(mousePosition))
                             ChargeJump(mousePosition);
                         break;
                     case State.Blocking:
-                        PlaceRod();
+                        PlaceBomb();
                         break;
                 }
             }
@@ -126,7 +121,7 @@ public class PlayerMover : MonoBehaviour
     {
         if (PauseMenu.instance.activeSelf)
         {
-            PauseMenu.instance.GetComponent<PauseMenu>().ToggleEnabled();
+            //PauseMenu.instance.GetComponent<PauseMenu>().ToggleEnabled();
             return;
         }
 
@@ -178,7 +173,7 @@ public class PlayerMover : MonoBehaviour
     
     private void Dash(Vector3 mousePosition)
     {
-        if (!StaminaCheck(10))
+        if (!CooldownCheck(dashCooldown))
             return;
 
         tr.enabled = true;
@@ -188,7 +183,7 @@ public class PlayerMover : MonoBehaviour
 
     private void Block()
     {
-        if (!StaminaCheck(10))
+        if (!CooldownCheck(blockCooldown))
             return;
 
         tr.enabled = false;
@@ -216,7 +211,6 @@ public class PlayerMover : MonoBehaviour
 
     private void JumpAttack(Vector3 direction)
     {
-        stamina -= 20;
         collider.enabled = false;
         rb.isKinematic = true;
         float speed = Vector3.Distance(direction, transform.position) / jumpTime;
@@ -235,7 +229,6 @@ public class PlayerMover : MonoBehaviour
             if (hit.collider)
             {
                 UnitStatus target = hit.collider.gameObject.GetComponent<UnitStatus>();
-                Debug.Log(target);
                 if (target)
                     target.TakeDamage(40, transform.position);
             }
@@ -250,16 +243,17 @@ public class PlayerMover : MonoBehaviour
         rb.velocity = Vector3.zero;
         rb.isKinematic = false;
 
-
+        if(cooldownActive)
+            CooldownCheck(stompCooldown);
     }
 
-    private void PlaceRod()
+    private void PlaceBomb()
     {
-        if (!StaminaCheck(10))
+        if (!CooldownCheck(placeCooldown))
             return;
 
         tr.enabled = false;
-        Instantiate(lightningRod, transform.position, Quaternion.identity);
+        Instantiate(lightningRod, transform.position, Quaternion.identity, PrefabManager.instance.roomObjects.transform);
         state = State.None;
     }
 
@@ -269,17 +263,17 @@ public class PlayerMover : MonoBehaviour
         sr.gameObject.GetComponent<RingRenderer>().Redraw();
     }
 
-    private bool StaminaCheck(float minimum)
+    private bool CooldownCheck(float duration)
     {
-        if (CodeManager.instance.GetBuffStaminaTimer() > 0)
+        if (!cooldownActive)
             return true;
 
-        if(stamina >= minimum)
+        if (actionCooldown <= 0)
         {
-            stamina -= minimum;
+            cooldownDisplay.Countdown(duration);
+            actionCooldown = duration;
             return true;
         }
-
         return false;
     }
 

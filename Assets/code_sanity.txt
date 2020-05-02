@@ -1,0 +1,70 @@
+BarDisplay		Attach to an object to make its localScale.x adjustable
+Bullet			Holds initial velocity of a projectile, allowing reversal
+
+Chunk			Corresponds to 1/9 of a room
+  ChunkData		Holds data needed to properly instantiate Chunk
+
+CodeDropper
+CodeManager
+CodePanel
+DamageDealer
+DamageNumber
+Door
+EnemyMoves
+Expander
+Exploder
+Fader
+Follower
+HealthBar
+Imploder
+LightningRod
+LootPhysics
+Magnet
+MapGenerator
+MapManager
+MenuNavigator
+Mob
+MobHealth
+MobMaker
+MobSpawner
+PauseMenu
+PlayerHealth
+PlayerMover
+PlayerStatus
+PowerupButton
+PrefabManager
+PRNG
+RingRenderer
+RoomArranger
+Test
+UIMap
+UnitStatus
+Vanisher
+
+TO-DO:
+Magnet-related null reference or out of bounds exceptions
+Mobs must not kill themselves with vortexes
+Randomized mob must be easier to stun and attack
+Decouple cross-class dependencies
+Mobs must look different
+Player must freeze between rooms
+Enemy targets where player was N frames ago
+Exploder created too soon (depends on platform)
+Scalable difficulty
+Graphics to show cooldown after attack
+Verify levels in JSON format
+[?] Make controls feel better on mobile
+
+DONE:
+Faster jump charge
+No stamina gauge
+[?] Powerups don't clutter screen
+Add stun all powerup
+Graphics to show status of active powerups
+UnitStatus objects must stay inside rooms
+Mobs must not synchronize
+Multiple codes must be handled cleanly
+Colored codes to reflect powerup type
+Lightning rod -> Remote bomb
+Codes sometimes 000000
+Doors sometimes not opening after killing enemies (related to null reference?)
